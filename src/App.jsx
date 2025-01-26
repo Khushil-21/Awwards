@@ -1,4 +1,8 @@
+import HeroSection from "./components/HeroSection";
 
 export default function App() {
-	return <div className="text-7xl font-bold text-violet-300">Welcome to Awwwards</div>;
+  return <main className="relative min-h-dvh min-w-dvw">
+    <HeroSection />
+  </main>
 }
+
