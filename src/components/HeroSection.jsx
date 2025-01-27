@@ -42,17 +42,19 @@ export default function HeroSection() {
 	useGSAP(
 		() => {
 			if (hasClicked) {
+				const tl = gsap.timeline();
+				
+				// Set initial visibility
 				gsap.set("#next-video", {
 					visibility: "visible",
 				});
 
-				gsap.to("#next-video", {
-					transformOrigin: "center center",
-					scale: 1,
+				// Expand the current preview to full screen
+				tl.to("#next-video", {
+					width: "100vw",
+					height: "100vh",
 					duration: 1,
 					ease: "power1.inOut",
-					width: "100%",
-					height: "100%",
 					onStart: () => nextVideoRef.current.play(),
 					onComplete: () => {
 						mainVideoRef.current.src = getVideoSrc(currentIndex);
@@ -60,12 +62,12 @@ export default function HeroSection() {
 					},
 				});
 
-				gsap.from("#preview-video", {
-					transformOrigin: "center center",
+				// Simultaneously animate the new preview from center
+				tl.from("#preview-video", {
 					scale: 0,
-					duration: 1.5,
+					duration: 1,
 					ease: "power1.inOut",
-				});
+				}, "<"); // The "<" makes this animation start at the same time as previous one
 			}
 		},
 		{ dependencies: [currentIndex], revertOnUpdate: true }
@@ -108,16 +110,15 @@ export default function HeroSection() {
 					<div className="mask-clip-path absolute-center absolute z-50 size-64 cursor-pointer overflow-hidden rounded-lg">
 						<div
 							onClick={handleMiniVdClick}
-							className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100"
+							className="origin-center opacity-0 transition-all duration-500 ease-in hover:opacity-100"
 						>
 							<video
 								src={getVideoSrc(upcomingVideoIndex)}
 								onLoadedData={handleVideoLoad}
-								autoPlay
 								loop
-								muted
+                muted
 								id="preview-video"
-								className="size-64 origin-center scale-150 object-cover object-center"
+								className="size-64 origin-center object-cover object-center"
 							/>
 						</div>
 					</div>
