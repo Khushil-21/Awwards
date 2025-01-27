@@ -7,12 +7,13 @@ export default function HeroSection() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [loadedVideos, setLoadedVideos] = useState(0);
 
-	const totalVideos = 3;
+	const totalVideos = 4;
 	const nextVideoRef = useRef(null);
+	const upcomingVideoIndex = (currentIndex % totalVideos) + 1;
 
 	function handleMiniVdClick() {
 		setHasClicked(true);
-		setCurrentIndex((prevIndex) => (prevIndex % totalVideos) + 1);
+		setCurrentIndex(upcomingVideoIndex);
 	}
 
 	function handleVideoLoad() {
@@ -35,7 +36,7 @@ export default function HeroSection() {
 						>
 							<video
 								ref={nextVideoRef}
-								src={getVideoSrc(currentIndex + 1)}
+								src={getVideoSrc(upcomingVideoIndex)}
 								onLoadedData={handleVideoLoad}
 								autoPlay
 								loop
@@ -45,6 +46,24 @@ export default function HeroSection() {
 							/>
 						</div>
 					</div>
+					<video
+						ref={nextVideoRef}
+						src={getVideoSrc(currentIndex)}
+						onLoadedData={handleVideoLoad}
+						autoPlay
+						muted
+						loop
+						id="next-video"
+						className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
+					/>
+					<video
+						src={getVideoSrc(currentIndex)}
+						onLoadedData={handleVideoLoad}
+						autoPlay
+						muted
+						loop
+						className="absolute left-0 top-0 size-full object-cover object-center"
+					/>
 				</div>
 			</div>
 		</div>
