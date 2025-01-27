@@ -2,6 +2,8 @@ import { useRef } from "react";
 import { useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import Button from "./Button";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 export default function HeroSection() {
 	const [currentIndex, setCurrentIndex] = useState(1);
@@ -24,6 +26,34 @@ export default function HeroSection() {
 
 	const getVideoSrc = (index) => `videos/hero-${index}.mp4`;
 
+	// GSAP Animations
+
+	useGSAP(
+		() => {
+			if (hasClicked) {
+				gsap.set("#next-video", {
+					visibility: "visible",
+				});
+				gsap.to("#next-video", {
+					transformOrigin: "center center",
+					scale: 1,
+					duration: 1,
+					ease: "power1.inOut",
+					width: "100%",
+					height: "100%",
+					onStart: () => nextVideoRef.current.play(),
+				});
+				gsap.from("#current-video", {
+					transformOrigin: "center center",
+					scale: 0,
+					duration: 1.5,
+					ease: "power1.inOut",
+				});
+			}
+		},
+		{ dependencies: [currentIndex], revertOnUpdate: true }
+	);
+
 	return (
 		<div className="h-dvh w-dvw relative">
 			<div
@@ -37,7 +67,7 @@ export default function HeroSection() {
 							className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100"
 						>
 							<video
-								ref={nextVideoRef}
+								// ref={nextVideoRef}
 								src={getVideoSrc(upcomingVideoIndex)}
 								onLoadedData={handleVideoLoad}
 								autoPlay
@@ -59,7 +89,9 @@ export default function HeroSection() {
 						className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
 					/>
 					<video
-						src={getVideoSrc(currentIndex)}
+						src={getVideoSrc(
+							currentIndex === totalVideos - 1 ? 1 : currentIndex
+						)}
 						onLoadedData={handleVideoLoad}
 						autoPlay
 						muted
