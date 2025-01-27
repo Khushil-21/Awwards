@@ -1,15 +1,19 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { TiLocationArrow } from "react-icons/ti";
 import Button from "./Button";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/all";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroSection() {
 	const [currentIndex, setCurrentIndex] = useState(1);
 	const [hasClicked, setHasClicked] = useState(false);
 	const [previousIndex, setPreviousIndex] = useState(1);
-	const [loadedVideos, setLoadedVideos] = useState(0);
+	const [isLoading, setIsLoading] = useState(true);
+	const [loadedVideos, setLoadedVideos] = useState(1);
 
 	const totalVideos = 4;
 	const nextVideoRef = useRef(null);
@@ -28,6 +32,12 @@ export default function HeroSection() {
 
 	const getVideoSrc = (index) => `videos/hero-${index}.mp4`;
 
+	useEffect(() => {
+		if (loadedVideos === totalVideos) {
+			setIsLoading(false);
+		}
+	}, [loadedVideos]);
+
 	// GSAP Animations
 	useGSAP(
 		() => {
@@ -35,7 +45,7 @@ export default function HeroSection() {
 				gsap.set("#next-video", {
 					visibility: "visible",
 				});
-				
+
 				gsap.to("#next-video", {
 					transformOrigin: "center center",
 					scale: 1,
@@ -47,11 +57,11 @@ export default function HeroSection() {
 					onComplete: () => {
 						mainVideoRef.current.src = getVideoSrc(currentIndex);
 						mainVideoRef.current.play();
-					}
+					},
 				});
 
 				gsap.from("#preview-video", {
-					transformOrigin: "center center", 
+					transformOrigin: "center center",
 					scale: 0,
 					duration: 1.5,
 					ease: "power1.inOut",
@@ -61,8 +71,35 @@ export default function HeroSection() {
 		{ dependencies: [currentIndex], revertOnUpdate: true }
 	);
 
+	useGSAP(() => {
+		gsap.set("#video-frame", {
+			clipPath: "polygon(14% 0, 72% 0, 88% 90%, 0 95%)",
+			borderRadius: "0% 0% 40% 10%",
+		});
+		gsap.from("#video-frame", {
+			clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+			borderRadius: "0% 0% 0% 0%",
+			ease: "power1.inOut",
+			scrollTrigger: {
+				trigger: "#video-frame",
+				start: "center center",
+				end: "bottom center",
+				scrub: true,
+			},
+		});
+	});
+
 	return (
 		<div className="h-dvh w-dvw relative">
+			{isLoading && (
+				<div className="flex-center absolute z-[100] h-dvh w-screen overflow-hidden bg-violet-50">
+					<div className="three-body">
+						<div className="three-body__dot"></div>
+						<div className="three-body__dot"></div>
+						<div className="three-body__dot"></div>
+					</div>
+				</div>
+			)}
 			<div
 				id="video-frame"
 				className="relative z-10 h-dvh w-dvw overflow-hidden bg-blue-75"
