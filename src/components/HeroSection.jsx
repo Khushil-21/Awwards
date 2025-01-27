@@ -8,14 +8,16 @@ import gsap from "gsap";
 export default function HeroSection() {
 	const [currentIndex, setCurrentIndex] = useState(1);
 	const [hasClicked, setHasClicked] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
+	const [previousIndex, setPreviousIndex] = useState(1);
 	const [loadedVideos, setLoadedVideos] = useState(0);
 
 	const totalVideos = 4;
 	const nextVideoRef = useRef(null);
+	const mainVideoRef = useRef(null);
 	const upcomingVideoIndex = (currentIndex % totalVideos) + 1;
 
 	function handleMiniVdClick() {
+		setPreviousIndex(currentIndex);
 		setHasClicked(true);
 		setCurrentIndex(upcomingVideoIndex);
 	}
@@ -27,13 +29,13 @@ export default function HeroSection() {
 	const getVideoSrc = (index) => `videos/hero-${index}.mp4`;
 
 	// GSAP Animations
-
 	useGSAP(
 		() => {
 			if (hasClicked) {
 				gsap.set("#next-video", {
 					visibility: "visible",
 				});
+				
 				gsap.to("#next-video", {
 					transformOrigin: "center center",
 					scale: 1,
@@ -42,9 +44,14 @@ export default function HeroSection() {
 					width: "100%",
 					height: "100%",
 					onStart: () => nextVideoRef.current.play(),
+					onComplete: () => {
+						mainVideoRef.current.src = getVideoSrc(currentIndex);
+						mainVideoRef.current.play();
+					}
 				});
-				gsap.from("#current-video", {
-					transformOrigin: "center center",
+
+				gsap.from("#preview-video", {
+					transformOrigin: "center center", 
 					scale: 0,
 					duration: 1.5,
 					ease: "power1.inOut",
@@ -67,13 +74,12 @@ export default function HeroSection() {
 							className="origin-center scale-50 opacity-0 transition-all duration-500 ease-in hover:scale-100 hover:opacity-100"
 						>
 							<video
-								// ref={nextVideoRef}
 								src={getVideoSrc(upcomingVideoIndex)}
 								onLoadedData={handleVideoLoad}
 								autoPlay
 								loop
 								muted
-								id="current-video"
+								id="preview-video"
 								className="size-64 origin-center scale-150 object-cover object-center"
 							/>
 						</div>
@@ -89,9 +95,8 @@ export default function HeroSection() {
 						className="absolute-center invisible absolute z-20 size-64 object-cover object-center"
 					/>
 					<video
-						src={getVideoSrc(
-							currentIndex === totalVideos - 1 ? 1 : currentIndex
-						)}
+						ref={mainVideoRef}
+						src={getVideoSrc(previousIndex)}
 						onLoadedData={handleVideoLoad}
 						autoPlay
 						muted
