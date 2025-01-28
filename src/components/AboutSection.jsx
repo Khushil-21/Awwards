@@ -12,7 +12,7 @@ export default function AboutSection() {
           scrollTrigger: {
             trigger: "#clip",
             start: "center center",
-            end: "+=800 center",
+            end: "+=900 center",
             scrub: 0.5,
             pin: true,
             pinSpacing: true,
